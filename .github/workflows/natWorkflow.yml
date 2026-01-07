@@ -7,11 +7,12 @@ on:
     branches:
       - master
 
-# Permissions nécessaires pour que l'Allure Action puisse commenter sur la PR
+# Permissions nécessaires pour que l'action puisse commenter sur la PR et déployer sur GitHub Pages
 permissions:
   pull-requests: write
   checks: write
   contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -35,7 +36,7 @@ jobs:
       - name: Run tests with Allure
         run: npm test
 
-      # 5. Génération du rapport Allure et publication du résumé sur la PR
+      # 5. Génération du rapport Allure, publication du résumé sur la PR et upload du rapport
       - name: Generate Allure Report
         if: always()
         uses: simple-elf/allure-report-action@master
@@ -46,10 +47,17 @@ jobs:
           keep_reports: 20
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6. Déploiement du rapport sur GitHub Pages (optionnel mais recommandé)
+      # 6. Déploiement du rapport sur GitHub Pages
       - name: Deploy report to GitHub Pages
         if: github.ref == 'refs/heads/master' && success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: allure-history
+```
+
+**Action requise :**
+1.  Copiez ce contenu.
+2.  Remplacez le fichier `.github/workflows/natWorkflow.yml` dans votre dépôt local.
+3.  Committez et **poussez** les changements.
+4.  Le pipeline devrait fonctionner correctement cette fois-ci.
