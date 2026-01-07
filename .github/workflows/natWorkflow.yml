@@ -41,15 +41,23 @@ jobs:
       - name: Generate Allure Report
         run: npx allure generate allure-results --clean -o allure-report
 
-      # 6. Publication du résumé sur la Pull Request
+      # 6. Upload des résultats bruts pour l'action de résumé
+      - name: Upload Allure Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      # 7. Publication du résumé sur la Pull Request
       - name: Post Allure Report Summary to PR
         if: github.event_name == 'pull_request'
         uses: allure-framework/allure-action@v0
         with:
+          results-dir: allure-results
           report-directory: "./allure-report"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. Upload du rapport complet en tant qu'artefact pour téléchargement
+      # 8. Upload du rapport complet en tant qu'artefact pour téléchargement
       - name: Upload Allure Report artifact
         uses: actions/upload-artifact@v4
         with:
