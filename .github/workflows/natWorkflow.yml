@@ -33,11 +33,15 @@ jobs:
         run: npm ci
 
       # 4. Exécution des tests et génération des résultats Allure
-      # La commande `npx allure run` encapsule `npm test` et génère le rapport
+      # Le rapport sera généré dans le dossier allure-results
       - name: Run tests with Allure
-        run: npx allure run -- npm test
+        run: npm test
 
-      # 5. Publication du résumé sur la Pull Request
+      # 5. Génération du rapport HTML à partir des résultats
+      - name: Generate Allure Report
+        run: npx allure generate allure-results --clean -o allure-report
+
+      # 6. Publication du résumé sur la Pull Request
       - name: Post Allure Report Summary to PR
         if: github.event_name == 'pull_request'
         uses: allure-framework/allure-action@v0
@@ -45,7 +49,7 @@ jobs:
           report-directory: "./allure-report"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6. Upload du rapport complet en tant qu'artefact pour téléchargement
+      # 7. Upload du rapport complet en tant qu'artefact pour téléchargement
       - name: Upload Allure Report artifact
         uses: actions/upload-artifact@v4
         with:
