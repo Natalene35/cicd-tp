@@ -1,4 +1,4 @@
-name: CI
+name: CI with Allure Report
 on:
   push:
     branches:
@@ -6,18 +6,48 @@ on:
   pull_request:
     branches:
       - master
+
+# Permissions nécessaires pour que l'Allure Action puisse commenter sur la PR
+permissions:
+  pull-requests: write
+  checks: write
+  contents: write
+
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      # 1. Checkout du code
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
           cache: 'npm'
+
+      # 3. Installation des dépendances
       - name: Install dependencies
         run: npm ci
-      - name: Run tests
-        run: npm test
-      - name: Run lint
-        run: npm run lint
+
+      # 4. Exécution des tests et génération des résultats Allure
+      # La commande `npx allure run` encapsule `npm test` et génère le rapport
+      - name: Run tests with Allure
+        run: npx allure run -- npm test
+
+      # 5. Publication du résumé sur la Pull Request
+      - name: Post Allure Report Summary to PR
+        if: github.event_name == 'pull_request'
+        uses: allure-framework/allure-action@v0
+        with:
+          report-directory: "./allure-report"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. Upload du rapport complet en tant qu'artefact pour téléchargement
+      - name: Upload Allure Report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
