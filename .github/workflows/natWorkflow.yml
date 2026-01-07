@@ -32,33 +32,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 4. Exécution des tests et génération des résultats Allure
-      - name: Run tests with Allure
-        run: npm test
+      # 4. Run tests (must use Allure reporter)
+      - name: Run tests and generate report
+        run: npx allure run -- npm run test
 
-      # 5. Génération du rapport Allure et publication du résumé sur la PR
-      - name: Generate Allure Report
-        if: always()
-        uses: simple-elf/allure-report-action@master
+      # 5. Post summary to PR
+      - name: Run Allure Action
+        uses: allure-framework/allure-action@v0
         with:
-          allure_results: allure-results
-          allure_report: allure-report
-          allure_history: allure-history
-          keep_reports: 20
-          # Correction: le paramètre doit être github-token
+          report-directory: "./allure-report"
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      # 6. Déploiement du rapport sur GitHub Pages (optionnel mais recommandé)
-      - name: Deploy report to GitHub Pages
-        if: github.ref == 'refs/heads/master' && success()
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-history
-```
-
-**Action requise :**
-1.  Remplacez le contenu de votre fichier `.github/workflows/natWorkflow.yml` par celui ci-dessus.
-2.  Committez et poussez cette modification.
-3.  Vérifiez bien que le nom du fichier est bien `natWorkflow.yml` dans le dossier `.github/workflows/`.
-4.  Relancez le workflow.
