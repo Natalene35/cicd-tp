@@ -56,8 +56,4 @@ jobs:
           publish_dir: allure-history
 ```
 
-**Action requise :**
-1.  Copiez ce contenu.
-2.  Remplacez le fichier `.github/workflows/natWorkflow.yml` dans votre dépôt local.
-3.  Committez et **poussez** les changements.
-4.  Le pipeline devrait fonctionner correctement cette fois-ci.
+Une fois que vous aurez poussé ce fichier corrigé, votre pipeline réapparaîtra et devrait fonctionner correctement.
